@@ -11,6 +11,7 @@
 
 #include <fstream>
 
+
 using namespace mind;
 
 /* The main entry of the program.
