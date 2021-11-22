@@ -236,6 +236,22 @@ void RiscvDesc::emitTac(Tac *t) {
         emitBinaryTac(RiscvInstr::ADD, t);
         break;
 
+    case Tac::SUB:
+        emitBinaryTac(RiscvInstr::SUB, t);
+        break;
+
+    case Tac::MUL:
+        emitBinaryTac(RiscvInstr::MUL, t);
+        break;
+
+    case Tac::DIV:
+        emitBinaryTac(RiscvInstr::DIV, t);
+        break;
+
+    case Tac::MOD:
+        emitBinaryTac(RiscvInstr::REM, t);
+        break;
+
     default:
         mind_assert(false); // should not appear inside a basic block
     }
@@ -455,7 +471,26 @@ void RiscvDesc::emitInstr(RiscvInstr *i) {
     case RiscvInstr::ADD:
         oss << "add" << i->r0->name << ", " << i->r1->name << ", " << i->r2->name;
         break;
-    
+
+    case RiscvInstr::SUB:
+        oss << "sub" << i->r0->name << ", " << i->r1->name << ", " << i->r2->name;
+        break;
+
+    case RiscvInstr::MUL:
+        oss << "mul" << i->r0->name << ", " << i->r1->name << ", "
+            << i->r2->name;
+        break;
+
+    case RiscvInstr::DIV:
+        oss << "div" << i->r0->name << ", " << i->r1->name << ", "
+            << i->r2->name;
+        break;
+
+    case RiscvInstr::REM:
+        oss << "rem" << i->r0->name << ", " << i->r1->name << ", "
+            << i->r2->name;
+        break;
+
     case RiscvInstr::BEQZ:
         oss << "beqz" << i->r0->name << ", " << i->l;
         break;
