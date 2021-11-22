@@ -340,12 +340,15 @@ void RiscvDesc::emitBinaryTac(RiscvInstr::OpCode op, Tac *t) {
     // basic ones
     switch (op) {
     case RiscvInstr::SLEQ:
-        addInstr(RiscvInstr::SGT, _reg[r0], _reg[r2], _reg[r1], 0, EMPTY_STR,
+        addInstr(RiscvInstr::SGT, _reg[r0], _reg[r1], _reg[r2], 0, EMPTY_STR,
                  NULL);
+        addInstr(RiscvInstr::LNOT, _reg[r0], _reg[r0], NULL, 0, EMPTY_STR, NULL);
         break;
 
     case RiscvInstr::SGEQ:
-        addInstr(RiscvInstr::SLT, _reg[r0], _reg[r2], _reg[r1], 0, EMPTY_STR,
+        addInstr(RiscvInstr::SLT, _reg[r0], _reg[r1], _reg[r2], 0, EMPTY_STR,
+                 NULL);
+        addInstr(RiscvInstr::LNOT, _reg[r0], _reg[r0], NULL, 0, EMPTY_STR,
                  NULL);
         break;
 
