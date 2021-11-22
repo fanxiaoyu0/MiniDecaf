@@ -38,6 +38,8 @@
 src/mind
 
 #auto generated code
+src/.idea/
+src/.vs/
 src/scanner.hpp
 src/scanner.cpp
 src/parser.hpp
@@ -54,3 +56,4 @@ debug.sh
 *.my
 *.actual
 mind.dSYM
+

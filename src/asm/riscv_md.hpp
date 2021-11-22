@@ -86,6 +86,8 @@ struct RiscvInstr : public Instr {
         // instructions/pseudo instructions
         ADD,
         NEG,
+        NOT,
+        SEQZ,
         J,
         BEQZ,
         RET,
