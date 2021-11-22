@@ -252,6 +252,38 @@ void RiscvDesc::emitTac(Tac *t) {
         emitBinaryTac(RiscvInstr::REM, t);
         break;
 
+    case Tac::LES:
+        emitBinaryTac(RiscvInstr::SLT, t);
+        break;
+
+    case Tac::GTR:
+        emitBinaryTac(RiscvInstr::SGT, t);
+        break;
+
+    case Tac::LEQ:
+        emitBinaryTac(RiscvInstr::SLEQ, t);
+        break;
+
+    case Tac::GEQ:
+        emitBinaryTac(RiscvInstr::SGEQ, t);
+        break;
+
+    case Tac::EQU:
+        emitBinaryTac(RiscvInstr::SEQ, t);
+        break;
+
+    case Tac::NEQ:
+        emitBinaryTac(RiscvInstr::SNE, t);
+        break;
+
+    case Tac::LAND:
+        emitBinaryTac(RiscvInstr::LAND, t);
+        break;
+
+    case Tac::LOR:
+        emitBinaryTac(RiscvInstr::LOR, t);
+        break;
+
     default:
         mind_assert(false); // should not appear inside a basic block
     }
@@ -298,15 +330,63 @@ void RiscvDesc::emitBinaryTac(RiscvInstr::OpCode op, Tac *t) {
     // eliminates useless assignments
     if (!t->LiveOut->contains(t->op0.var))
         return;
-
-    Set<Temp>* liveness = t->LiveOut->clone();
+    Set<Temp> *liveness = t->LiveOut->clone();
     liveness->add(t->op1.var);
     liveness->add(t->op2.var);
     int r1 = getRegForRead(t->op1.var, 0, liveness);
     int r2 = getRegForRead(t->op2.var, r1, liveness);
     int r0 = getRegForWrite(t->op0.var, r1, r2, liveness);
+    // in risc-v, some instructions need to be implemented with several
+    // basic ones
+    switch (op) {
+    case RiscvInstr::SLEQ:
+        addInstr(RiscvInstr::SGT, _reg[r0], _reg[r2], _reg[r1], 0, EMPTY_STR,
+                 NULL);
+        break;
 
-    addInstr(op, _reg[r0], _reg[r1], _reg[r2], 0, EMPTY_STR, NULL);
+    case RiscvInstr::SGEQ:
+        addInstr(RiscvInstr::SLT, _reg[r0], _reg[r2], _reg[r1], 0, EMPTY_STR,
+                 NULL);
+        break;
+
+    case RiscvInstr::SEQ:
+        addInstr(RiscvInstr::SUB, _reg[r0], _reg[r1], _reg[r2], 0, EMPTY_STR,
+                 NULL);
+        addInstr(RiscvInstr::SEQZ, _reg[r0], _reg[r0], NULL, 0, EMPTY_STR,
+                 NULL);
+        break;
+
+    case RiscvInstr::SNE:
+        addInstr(RiscvInstr::SUB, _reg[r0], _reg[r1], _reg[r2], 0, EMPTY_STR,
+                 NULL);
+        addInstr(RiscvInstr::SNEZ, _reg[r0], _reg[r0], NULL, 0, EMPTY_STR,
+                 NULL);
+        break;
+
+    case RiscvInstr::LAND:
+        // snez d, s1; sub d, zero, d; and d, d, s2; snez d, d;
+        addInstr(RiscvInstr::SNEZ, _reg[r0], _reg[r1], NULL, 0, EMPTY_STR,
+                 NULL);
+        addInstr(RiscvInstr::NEG, _reg[r0], _reg[r0], NULL, 0, EMPTY_STR,
+                 NULL);
+        addInstr(RiscvInstr::AND, _reg[r0], _reg[r0], _reg[r2], 0, EMPTY_STR,
+                 NULL);
+        addInstr(RiscvInstr::SNEZ, _reg[r0], _reg[r0], NULL, 0, EMPTY_STR,
+                 NULL);
+        break;
+
+    case RiscvInstr::LOR:
+        // or t3,t1,t2 ; snez t3,t3
+        addInstr(RiscvInstr::OR, _reg[r0], _reg[r1], _reg[r2], 0, EMPTY_STR,
+                 NULL);
+        addInstr(RiscvInstr::SNEZ, _reg[r0], _reg[r0], NULL, 0, EMPTY_STR,
+                 NULL);
+        break;
+
+    default:
+        addInstr(op, _reg[r0], _reg[r1], _reg[r2], 0, EMPTY_STR, NULL);
+        break;
+    }
 }
 
 /* Outputs a single instruction line.
@@ -448,6 +528,10 @@ void RiscvDesc::emitInstr(RiscvInstr *i) {
         oss << "seqz" << i->r0->name << ", " << i->r1->name;
         break;
 
+    case RiscvInstr::SNEZ:
+        oss << "snez" << i->r0->name << ", " << i->r1->name;
+        break;
+
     case RiscvInstr::NOT:
         oss << "not" << i->r0->name << ", " << i->r1->name;
         break;
@@ -477,17 +561,32 @@ void RiscvDesc::emitInstr(RiscvInstr *i) {
         break;
 
     case RiscvInstr::MUL:
-        oss << "mul" << i->r0->name << ", " << i->r1->name << ", "
-            << i->r2->name;
+        oss << "mul" << i->r0->name << ", " << i->r1->name << ", " << i->r2->name;
         break;
 
     case RiscvInstr::DIV:
-        oss << "div" << i->r0->name << ", " << i->r1->name << ", "
-            << i->r2->name;
+        oss << "div" << i->r0->name << ", " << i->r1->name << ", " << i->r2->name;
         break;
 
     case RiscvInstr::REM:
-        oss << "rem" << i->r0->name << ", " << i->r1->name << ", "
+        oss << "rem" << i->r0->name << ", " << i->r1->name << ", " << i->r2->name;
+        break;
+
+    case RiscvInstr::SLT:
+        oss << "slt" << i->r0->name << ", " << i->r1->name << ", " << i->r2->name;
+        break;
+
+    case RiscvInstr::SGT:
+        oss << "sgt" << i->r0->name << ", " << i->r1->name << ", " << i->r2->name;
+        break;
+
+    case RiscvInstr::AND:
+        oss << "and" << i->r0->name << ", " << i->r1->name << ", "
+            << i->r2->name;
+        break;
+
+    case RiscvInstr::OR:
+        oss << "or" << i->r0->name << ", " << i->r1->name << ", "
             << i->r2->name;
         break;
 
