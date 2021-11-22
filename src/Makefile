@@ -16,7 +16,7 @@ CXX = g++
 CC = gcc
 INCLUDES = -I .
 CFLAGS = $(INCLUDES) $(DEFINES)  -g -Wall -pipe -DUSING_GCC
-CXXFLAGS = $(INCLUDES) $(DEFINES)  -g -Wall -pipe -DUSING_GCC
+CXXFLAGS = $(INCLUDES) $(DEFINES)  -g -Wall -pipe -DUSING_GCC -std=c++11
 YFLAGS = -dv
 LDFLAGS = -lm -lgc -g
 CSH = bash
