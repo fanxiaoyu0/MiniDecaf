@@ -277,15 +277,6 @@ void Translation::visit(ast::OrExpr *e) {
     e->ATTR(val) = tr->genLOr(e->e1->ATTR(val), e->e2->ATTR(val));
 }
 
-/* Translating an ast::ModExpr node.
- */
-void Translation::visit(ast::ModExpr *e) {
-    e->e1->accept(this);
-    e->e2->accept(this);
-
-    e->ATTR(val) = tr->genMod(e->e1->ATTR(val), e->e2->ATTR(val));
-}
-
 /* Translating an ast::IntConst node.
  */
 void Translation::visit(ast::IntConst *e) {
