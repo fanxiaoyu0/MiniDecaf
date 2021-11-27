@@ -233,7 +233,7 @@ VarDecl     : IntType IDENTIFIER SEMICOLON
             ;
 
 VarRef      : IDENTIFIER
-                { $$ = new ast::ValRef($1,POS(@1)); }
+                { $$ = new ast::VarRef($1,POS(@1)); }
             ;
 
 AssignExpr  : VarRef ASSIGN Expr SEMICOLON
