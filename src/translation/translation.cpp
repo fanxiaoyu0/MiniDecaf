@@ -319,9 +319,9 @@ void Translation::visit(ast::BitNotExpr *e) {
 void Translation::visit(ast::LvalueExpr *e) {
     // The only task is to change e->ATTR(val) for its father's use.
     e->lvalue->accept(this);
-    // e Îª visit(ast::LvalueExpr* e) µÄ²ÎÊý
+    // e Îª visit(ast::LvalueExpr* e) ï¿½Ä²ï¿½ï¿½ï¿½
     const auto &sym = ((ast::VarRef *)e->lvalue)->ATTR(sym);
-    // ÕâÊ±£¬¿ÉÒÔÍ¨¹ý sym->getTemp() ·ÃÎÊ¸Ã·ûºÅ¶ÔÓ¦µÄ Temp
+    // ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ sym->getTemp() ï¿½ï¿½ï¿½Ê¸Ã·ï¿½ï¿½Å¶ï¿½Ó¦ï¿½ï¿½ Temp
     e->ATTR(val) = sym->getTemp();
 }
 
