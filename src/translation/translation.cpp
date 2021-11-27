@@ -95,7 +95,10 @@ void Translation::visit(ast::FuncDefn *f) {
  *   different kinds of Lvalue require different translation
  */
 void Translation::visit(ast::AssignExpr *s) {
-    // TODO
+    s->left->accept(this);
+    s->e->accept(this);
+    const auto &symbol = ((ast::VarRef *)s->left)->ATTR(sym);
+    s->ATTR(val) = tr->genAssign(symbol->getTemp(), s->e->ATTR(val));
 }
 
 /* Translating an ast::ExprStmt node.
@@ -313,7 +316,12 @@ void Translation::visit(ast::BitNotExpr *e) {
  *   different Lvalue kinds need different translation
  */
 void Translation::visit(ast::LvalueExpr *e) {
-    // TODO
+    // The only task is to change e->ATTR(val) for its father's use.
+    e->lvalue->accept(this);
+    // e 为 visit(ast::LvalueExpr* e) 的参数
+    const auto &sym = ((ast::VarRef *)e->lvalue)->ATTR(sym);
+    // 这时，可以通过 sym->getTemp() 访问该符号对应的 Temp
+    e->ATTR(val) = sym->getTemp();
 }
 
 /* Translating an ast::VarRef node.
@@ -323,6 +331,7 @@ void Translation::visit(ast::LvalueExpr *e) {
  * variables
  */
 void Translation::visit(ast::VarRef *ref) {
+    // only to check Lvalue's type.
     switch (ref->ATTR(lv_kind)) {
     case ast::Lvalue::SIMPLE_VAR:
         // nothing to do
@@ -338,6 +347,13 @@ void Translation::visit(ast::VarRef *ref) {
  */
 void Translation::visit(ast::VarDecl *decl) {
     // TODO
+    Temp temp = tr->getNewTempI4();
+    decl->ATTR(sym)->attachTemp(temp);
+    if (decl->init != NULL) {
+        // TODO: assign value process according visit(AssignExpr*)
+        decl->init->accept(this);
+        tr->genAssign(decl->ATTR(sym)->getTemp(), decl->init->ATTR(val));
+    }
 }
 
 /* Translates an entire AST into a Piece list.

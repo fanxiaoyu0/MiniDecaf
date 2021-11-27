@@ -347,6 +347,9 @@ void SemPass2::visit(ast::LvalueExpr *e) {
 void SemPass2::visit(ast::VarRef *ref) {
     // CASE I: owner is NULL ==> referencing a local var or a member var?
     Symbol *v = scopes->lookup(ref->var, ref->getLocation());
+    // ?: Seems to check if a variable is decleared or not is the work
+    // of SemPass1. Why does it do it now?
+    // If do this, variable decleared soon could be used now. 
     if (NULL == v) {
         issue(ref->getLocation(), new SymbolNotFoundError(ref->var));
         goto issue_error_type;

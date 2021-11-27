@@ -163,7 +163,24 @@ void SemPass1::visit(ast::VarDecl *vdecl) {
 
     vdecl->type->accept(this);
     t = vdecl->type->ATTR(type);
-
+    if (scopes->lookup(vdecl->name, vdecl->loc, false) != NULL) { // 报错
+        issue(vdecl->loc, new DeclConflictError(vdecl->name, symbol));
+    } else {
+        Variable* symbol = new Variable(vdecl->name, t, vdecl->loc);
+        scopes->declare(symbol);
+        vdecl->ATTR(sym) = symbol;
+        if (vdecl->init != NULL) {
+            vdecl->init->accept(this);
+            // 如果这个变量定义设置了初值，还需要继续访问初值表达式
+            // SemPass2 did this work!?!
+            // Why should I visit the init of VarDecl? It is only consist of constant value. 
+            // Will it support using other variable to define this variable ?
+            // At that time, I should visit the init because maybe it will use variable undecleared.
+            // 如何继续访问初值表达式（需要我自己写 Expr 的 accept function?）
+            //vdcel->init->accept(this);
+        }
+        
+    }
     // TODO: Add a new symbol to a scope
     // 1. Create a new `Variable` symbol
     // 2. Check for conflict in `scopes`, which is a global variable refering to

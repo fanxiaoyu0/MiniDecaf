@@ -96,6 +96,12 @@ void scan_end();
 %nterm<mind::ast::Type*> Type
 %nterm<mind::ast::Statement*> Stmt  ReturnStmt ExprStmt IfStmt  CompStmt WhileStmt 
 %nterm<mind::ast::Expr*> Expr
+%nterm<mind::ast::VarDecl*> VarDecl
+%nterm<mind::ast::VarRef*> VarRef
+%nterm<mind::ast::AssignExpr*> AssignExpr
+%nterm<mind::ast::IntType*> IntType
+%nterm<mind::ast::LvalueExpr*> LvalueExpr
+
 /*   SUBSECTION 2.2: associativeness & precedences */
 %nonassoc QUESTION
 %left     OR
@@ -140,6 +146,7 @@ FormalList :  /* EMPTY */
 
 Type        : INT
                 { $$ = new ast::IntType(POS(@1)); }
+
 StmtList    : /* empty */
                 { $$ = new ast::StmtList(); }
             | StmtList Stmt
@@ -152,10 +159,12 @@ Stmt        : ReturnStmt {$$ = $1;}|
               IfStmt     {$$ = $1;}|
               WhileStmt  {$$ = $1;}|
               CompStmt   {$$ = $1;}|
+              VarDecl    {$$ = $1;}|
+              AssignExpr {$$ = $1;}|
               BREAK SEMICOLON  
                 {$$ = new ast::BreakStmt(POS(@1));} |
               SEMICOLON
-                {$$ = new ast::EmptyStmt(POS(@1));}
+                {$$ = new ast::EmptyStmt(POS(@1));} 
             ;
 CompStmt    : LBRACE StmtList RBRACE
                 {$$ = new ast::CompStmt($2,POS(@1));}
@@ -213,7 +222,26 @@ Expr        : ICONST
                 { $$ = new ast::AndExpr($1, $3, POS(@2)); }
             | Expr OR Expr
                 { $$ = new ast::OrExpr($1, $3, POS(@2)); }
+            | VarRef
+                { $$ = new ast::LvalueExpr($1, POS(@1)); }
             ;
+
+VarDecl     : IntType IDENTIFIER SEMICOLON
+                { $$ = new ast::VarDecl($2,$1,POS(@1)); }
+            | IntType IDENTIFIER ASSIGN Expr SEMICOLON
+                { $$ = new ast::VarDecl($2,$1,$4,POS(@1)); }
+            ;
+
+VarRef      : IDENTIFIER
+                { $$ = new ast::ValRef($1,POS(@1)); }
+            ;
+
+AssignExpr  : VarRef ASSIGN Expr SEMICOLON
+                { $$ = new ast::AssignExpr($1, $3, POS(@1)); }
+            ;
+
+IntType     : INT
+                { $$ = new ast::IntType(POS(@1)); }
 
 %%
 

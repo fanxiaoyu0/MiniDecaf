@@ -38,6 +38,7 @@
 src/mind
 
 #auto generated code
+src/.vscode/
 src/.idea/
 src/.vs/
 src/scanner.hpp
