@@ -98,7 +98,8 @@ void Translation::visit(ast::AssignExpr *s) {
     s->left->accept(this);
     s->e->accept(this);
     const auto &symbol = ((ast::VarRef *)s->left)->ATTR(sym);
-    s->ATTR(val) = tr->genAssign(symbol->getTemp(), s->e->ATTR(val));
+    tr->genAssign(symbol->getTemp(), s->e->ATTR(val));
+    s->ATTR(val) = s->e->ATTR(val);
 }
 
 /* Translating an ast::ExprStmt node.
