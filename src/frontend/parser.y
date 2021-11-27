@@ -160,7 +160,6 @@ Stmt        : ReturnStmt {$$ = $1;}|
               WhileStmt  {$$ = $1;}|
               CompStmt   {$$ = $1;}|
               VarDecl    {$$ = $1;}|
-              AssignExpr {$$ = $1;}|
               BREAK SEMICOLON  
                 {$$ = new ast::BreakStmt(POS(@1));} |
               SEMICOLON
@@ -224,6 +223,8 @@ Expr        : ICONST
                 { $$ = new ast::OrExpr($1, $3, POS(@2)); }
             | VarRef
                 { $$ = new ast::LvalueExpr($1, POS(@1)); }
+            | AssignExpr
+                { $$ = $1;}
             ;
 
 VarDecl     : IntType IDENTIFIER SEMICOLON
@@ -236,7 +237,7 @@ VarRef      : IDENTIFIER
                 { $$ = new ast::VarRef($1,POS(@1)); }
             ;
 
-AssignExpr  : VarRef ASSIGN Expr SEMICOLON
+AssignExpr  : VarRef ASSIGN Expr
                 { $$ = new ast::AssignExpr($1, $3, POS(@1)); }
             ;
 
