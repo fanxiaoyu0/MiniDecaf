@@ -100,7 +100,6 @@ void scan_end();
 %nterm<mind::ast::VarRef*> VarRef
 %nterm<mind::ast::AssignExpr*> AssignExpr
 %nterm<mind::ast::IntType*> IntType
-%nterm<mind::ast::LvalueExpr*> LvalueExpr
 
 /*   SUBSECTION 2.2: associativeness & precedences */
 %nonassoc QUESTION
