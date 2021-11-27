@@ -163,11 +163,13 @@ void SemPass1::visit(ast::VarDecl *vdecl) {
 
     vdecl->type->accept(this);
     t = vdecl->type->ATTR(type);
-    Symbol* symbol = scopes->lookup(vdecl->name, vdecl->getLocation(), false);
-    if (symbol != NULL) { // ±¨´í
-        issue(vdecl->getLocation(), new DeclConflictError(vdecl->name, symbol));
+    if (scopes->lookup(vdecl->name, vdecl->getLocation(), false) != NULL) { // ±¨´í
+        issue(vdecl->getLocation(),
+              new DeclConflictError(
+                  vdecl->name,
+                  scopes->lookup(vdecl->name, vdecl->getLocation(), false)));
     } else {
-        symbol = new Variable(vdecl->name, t, vdecl->getLocation());
+        Variable symbol = new Variable(vdecl->name, t, vdecl->getLocation());
         scopes->declare(symbol);
         vdecl->ATTR(sym) = symbol;
         if (vdecl->init != NULL) {
