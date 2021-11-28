@@ -50,6 +50,7 @@ class SemPass2 : public ast::Visitor {
     virtual void visit(ast::BitNotExpr *);
     virtual void visit(ast::LvalueExpr *);
     virtual void visit(ast::VarRef *);
+    virtual void visit(ast::IfExpr *);
     // Visiting statements
     virtual void visit(ast::VarDecl *);
     virtual void visit(ast::CompStmt *);
@@ -391,17 +392,33 @@ void SemPass2::visit(ast::VarDecl *decl) {
  * PARAMETERS:
  *   e     - the ast::AssignStmt node
  */
-void SemPass2::visit(ast::AssignExpr *s) {
-    s->left->accept(this);
-    s->e->accept(this);
+void SemPass2::visit(ast::AssignExpr *e) {
+    e->left->accept(this);
+    e->e->accept(this);
 
-    if (!isErrorType(s->left->ATTR(type)) &&
-        !s->e->ATTR(type)->compatible(s->left->ATTR(type))) {
-        issue(s->getLocation(),
-              new IncompatibleError(s->left->ATTR(type), s->e->ATTR(type)));
+    if (!isErrorType(e->left->ATTR(type)) &&
+        !e->e->ATTR(type)->compatible(e->left->ATTR(type))) {
+        issue(e->getLocation(),
+              new IncompatibleError(e->left->ATTR(type), e->e->ATTR(type)));
     }
 
-    s->ATTR(type) = s->left->ATTR(type);
+    e->ATTR(type) = e->left->ATTR(type);
+}
+
+/* Visits an ast::IfExpr node.
+ *
+ * PARAMETERS:
+ *   e     - the ast::IfExpr node
+ */
+void SemPass2::visit(ast::IfExpr *e) {
+    e->condition->accept(this);
+    if (!e->condition->ATTR(type)->equal(BaseType::Int)) {
+        issue(e->condition->getLocation(), new BadTestExprError());
+    }
+
+    e->true_brch->accept(this);
+    e->false_brch->accept(this);
+    e->ATTR(type) = e->true_brch->ATTR(type);
 }
 
 /* Visits an ast::ExprStmt node.

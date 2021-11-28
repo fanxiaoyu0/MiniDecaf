@@ -89,17 +89,17 @@ void Translation::visit(ast::FuncDefn *f) {
     tr->endFunc();
 }
 
-/* Translating an ast::AssignStmt node.
+/* Translating an ast::AssignExpr node.
  *
  * NOTE:
  *   different kinds of Lvalue require different translation
  */
-void Translation::visit(ast::AssignExpr *s) {
-    s->left->accept(this);
-    s->e->accept(this);
-    const auto &symbol = ((ast::VarRef *)s->left)->ATTR(sym);
-    tr->genAssign(symbol->getTemp(), s->e->ATTR(val));
-    s->ATTR(val) = s->e->ATTR(val);
+void Translation::visit(ast::AssignExpr *e) {
+    e->left->accept(this);
+    e->e->accept(this);
+    const auto &symbol = ((ast::VarRef *)e->left)->ATTR(sym);
+    tr->genAssign(symbol->getTemp(), e->e->ATTR(val));
+    e->ATTR(val) = e->e->ATTR(val);
 }
 
 /* Translating an ast::ExprStmt node.
@@ -325,6 +325,29 @@ void Translation::visit(ast::LvalueExpr *e) {
     e->ATTR(val) = sym->getTemp();
 }
 
+/* Translating an ast::IfExpr node.
+ *
+ * NOTE:
+ *   you don't need to test whether the false_brch is empty
+ */
+void Translation::visit(ast::IfExpr *e) {
+    Label L1 = tr->getNewLabel(); // entry of the false branch
+    Label L2 = tr->getNewLabel(); // exit
+    e->condition->accept(this);
+    Temp temp = tr->getNewTempI4();
+    e->ATTR(val)=temp;
+    tr->genJumpOnZero(L1, e->condition->ATTR(val));
+
+    e->true_brch->accept(this);
+    tr->genAssign(e->ATTR(val), e->true_brch->ATTR(val));
+    tr->genJump(L2); // done
+
+    tr->genMarkLabel(L1);
+    e->false_brch->accept(this);
+    tr->genAssign(e->ATTR(val), e->false_brch->ATTR(val));
+    tr->genMarkLabel(L2);
+}
+
 /* Translating an ast::VarRef node.
  *
  * NOTE:
@@ -347,7 +370,6 @@ void Translation::visit(ast::VarRef *ref) {
 /* Translating an ast::VarDecl node.
  */
 void Translation::visit(ast::VarDecl *decl) {
-    // TODO
     Temp temp = tr->getNewTempI4();
     decl->ATTR(sym)->attachTemp(temp);
     if (decl->init != NULL) {

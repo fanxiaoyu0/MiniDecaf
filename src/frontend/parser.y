@@ -240,6 +240,7 @@ AssignExpr  : VarRef ASSIGN Expr
 IntType     : INT
                 { $$ = new ast::IntType(POS(@1)); }
 
+
 %%
 
 /* SECTION IV: customized section */

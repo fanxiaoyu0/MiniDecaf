@@ -77,7 +77,7 @@ void MindCompiler::compile(const char *input, std::ostream &result) {
     err::checkPoint();
 
     checkTypes(tree);
-
+    // std::cout<<"check types well!"<<std::endl;
     // Checkpoint 3: if the typing rules were not satisfied, terminate the
     // program.
     err::checkPoint();
@@ -87,7 +87,7 @@ void MindCompiler::compile(const char *input, std::ostream &result) {
         result.flush();
         return;
     }
-
+    // std::cout<<"before translate!"<<std::endl;
     // translating to linear IR
     tac::Piece *ir = translate(tree);
 
