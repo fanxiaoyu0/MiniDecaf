@@ -373,7 +373,6 @@ void Translation::visit(ast::VarDecl *decl) {
     Temp temp = tr->getNewTempI4();
     decl->ATTR(sym)->attachTemp(temp);
     if (decl->init != NULL) {
-        // TODO: assign value process according visit(AssignExpr*)
         decl->init->accept(this);
         tr->genAssign(decl->ATTR(sym)->getTemp(), decl->init->ATTR(val));
     }
