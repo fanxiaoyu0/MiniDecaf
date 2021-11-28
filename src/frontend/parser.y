@@ -148,6 +148,9 @@ StmtList    : /* empty */
             | StmtList Stmt
                 { $1->append($2);
                   $$ = $1; }
+            | StmtList VarDecl
+                { $1->append($2);
+                  $$ = $1; }
             ;
 
 Stmt        : ReturnStmt {$$ = $1;}|
@@ -155,7 +158,6 @@ Stmt        : ReturnStmt {$$ = $1;}|
               IfStmt     {$$ = $1;}|
               WhileStmt  {$$ = $1;}|
               CompStmt   {$$ = $1;}|
-              VarDecl    {$$ = $1;}|
               BREAK SEMICOLON  
                 {$$ = new ast::BreakStmt(POS(@1));} |
               SEMICOLON
