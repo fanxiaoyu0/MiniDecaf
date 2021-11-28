@@ -53,7 +53,9 @@ MindCompiler::MindCompiler() {
  */
 void MindCompiler::compile(const char *input, std::ostream &result) {
     // syntatical analysis
+    // std::cout<<"before parse!"<<std::endl;
     ast::Program *tree = parseFile(input);
+    // std::cout<<"check point after parse!"<<std::endl;
     // Checkpoint 1: if we get a bad AST, terminate the compilation.
     err::checkPoint();
 
@@ -62,9 +64,10 @@ void MindCompiler::compile(const char *input, std::ostream &result) {
         result.flush();
         return;
     }
-
+    // std::cout<<"before build symbols!"<<std::endl;
     // semantical analysis
     buildSymbols(tree);
+    // std::cout<<"build symbols well!"<<std::endl;
     // TO STUDENTS: if you want to have a look at the symbol tables,
     //              enable the following 2 lines
     // result << tree->ATTR(gscope) << std::endl;

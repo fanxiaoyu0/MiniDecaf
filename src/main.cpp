@@ -26,13 +26,16 @@ int main(int argc, char **argv) {
 
     // parses the command line options (SEE ALSO: mind::Option)
     Option::parse(argc, argv);
+    // std::cout<<"parse parameters well!"<<std::endl;
     // creates an instance of the compiler
     MindCompiler *c = new MindCompiler();
     // let's go!
     if (Option::getOutput() == NULL) {
+        // std::cout<<"getOutput !well!"<<std::endl;
         c->compile(Option::getInput(), std::cout);
         std::cout.flush();
     } else {
+        // std::cout<<"getOutput well!"<<std::endl;
         std::ofstream fout(Option::getOutput());
         c->compile(Option::getInput(), fout);
         fout.flush();
