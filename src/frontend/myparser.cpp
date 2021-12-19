@@ -331,7 +331,7 @@ static ast::Expr* p_Assignment(){
   // p_declaration p_block p_if p_return p_type
     lookahead(TokenType::ASSIGN);
     ast::Expr* expression = p_Expression();
-    return new ast::AssignExpr(dynamic_cast<ast::VarRef*>(dynamic_cast<ast::LvalueExpr*>(node)), expression, node->getLocation());
+    return new ast::AssignExpr(dynamic_cast<ast::LvalueExpr*>(node)->lvalue, expression, node->getLocation());
   }
   return node;
 }
