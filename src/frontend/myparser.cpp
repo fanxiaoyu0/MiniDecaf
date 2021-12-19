@@ -327,6 +327,8 @@ static ast::Expr* p_Assignment(){
    * hence some conversion is needed (`Expr` to `LvalueExpr` to `VarRef`)  
    * condider dynamic_cast<> here
    **/
+  // p_relational p_logical_and p_assignment p_expression p_statement
+  // p_declaration p_block p_if p_return p_type
     lookahead(TokenType::ASSIGN);
     ast::Expr* expression = p_Expression();
     return new ast::AssignExpr(dynamic_cast<ast::VarRef*>(dynamic_cast<ast::LvalueExpr*>(node)), expression, node->getLocation());
