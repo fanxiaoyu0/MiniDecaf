@@ -30,6 +30,7 @@ static void init_first_set(){
 在同学们需要填空的代码中，待选择的多个产生式右端通常都以终结符开始，因此只需通过判断 next token 的终结符类型选择产生式即可，
 无需用到isFirst集合。同时请注意【目前的isFirst集合并不完整】，如果想使用，请按照自己需求【初始化对应项的值】。
 */
+
   memset(isFirst,0,sizeof(isFirst));
   //incrementally build first set for Primary/Unary/Multiplicative/Additive/Relational
   isFirst[SymbolType::Primary][TokenType::ICONST] = true;
