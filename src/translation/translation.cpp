@@ -150,6 +150,10 @@ void Translation::visit(ast::WhileStmt *s) {
  */
 void Translation::visit(ast::BreakStmt *s) { tr->genJump(current_break_label); }
 
+/* Translating an ast::ContStmt node.
+ */
+void Translation::visit(ast::ContStmt *s) { tr->genJump(current_break_label); }
+
 /* Translating an ast::CompStmt node.
  */
 void Translation::visit(ast::CompStmt *c) {

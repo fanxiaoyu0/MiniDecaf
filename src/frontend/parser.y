@@ -59,6 +59,7 @@ void scan_end();
    WHILE "while"
    FOR "for"
    BREAK "break"
+   CONTINUE "continue"
    EQU "=="
    NEQ "!="
    AND "&&" 
@@ -94,7 +95,7 @@ void scan_end();
 %nterm<mind::ast::Program* > Program FoDList
 %nterm<mind::ast::FuncDefn* > FuncDefn
 %nterm<mind::ast::Type*> Type IntType
-%nterm<mind::ast::Statement*> Stmt  ReturnStmt ExprStmt IfStmt  CompStmt WhileStmt VarDecl
+%nterm<mind::ast::Statement*> Stmt ReturnStmt ExprStmt IfStmt CompStmt WhileStmt VarDecl ForStmt DoWhileStmt BreakStmt ContinueStmt
 %nterm<mind::ast::Expr*> Expr AssignExpr
 %nterm<mind::ast::VarRef*> VarRef
 
@@ -157,11 +158,15 @@ Stmt        : ReturnStmt {$$ = $1;}|
               ExprStmt   {$$ = $1;}|
               IfStmt     {$$ = $1;}|
               WhileStmt  {$$ = $1;}|
+              ForStmt    {$$ = $1;}|
+              DoWhileStmt{$$ = $1;}|
               CompStmt   {$$ = $1;}|
               BREAK SEMICOLON  
                 {$$ = new ast::BreakStmt(POS(@1));} |
+              CONTINUE SEMICOLON  
+                {$$ = new ast::ContStmt(POS(@1));} |
               SEMICOLON
-                {$$ = new ast::EmptyStmt(POS(@1));} 
+                {$$ = new ast::EmptyStmt(POS(@1));}
             ;
 CompStmt    : LBRACE StmtList RBRACE
                 {$$ = new ast::CompStmt($2,POS(@1));}
