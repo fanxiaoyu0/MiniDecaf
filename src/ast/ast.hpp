@@ -137,6 +137,9 @@ class Expr : public ASTNode {
     tac::Temp ATTR(val);    // for tac generation
 };
 
+class ExprOrEpsilon : public Expr {
+};
+
 /* Node representing a left-value expression (lvalue).
  *
  * NOTE:
