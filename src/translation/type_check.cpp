@@ -52,13 +52,17 @@ class SemPass2 : public ast::Visitor {
     virtual void visit(ast::VarRef *);
     virtual void visit(ast::IfExpr *);
     // Visiting statements
-    virtual void visit(ast::VarDecl *);
     virtual void visit(ast::CompStmt *);
     virtual void visit(ast::ExprStmt *);
     virtual void visit(ast::IfStmt *);
     virtual void visit(ast::ReturnStmt *);
     virtual void visit(ast::WhileStmt *);
+    virtual void visit(ast::DoWhileStmt *);
+    virtual void visit(ast::ForStmt *);
+    virtual void visit(ast::BreakStmt *);
+    virtual void visit(ast::ContStmt *);
     // Visiting declarations
+    virtual void visit(ast::VarDecl *);
     virtual void visit(ast::FuncDefn *);
     virtual void visit(ast::Program *);
 };
@@ -455,6 +459,7 @@ void SemPass2::visit(ast::CompStmt *c) {
         (*it)->accept(this);
     scopes->close();
 }
+
 /* Visits an ast::WhileStmt node.
  *
  * PARAMETERS:
@@ -468,6 +473,67 @@ void SemPass2::visit(ast::WhileStmt *s) {
 
     s->loop_body->accept(this);
 }
+
+/* Visits an ast::DoWhileStmt node.
+ *
+ * PARAMETERS:
+ *   e     - the ast::DoWhileStmt node
+ */
+void SemPass2::visit(ast::DoWhileStmt *s) {
+    s->condition->accept(this);
+    if (!s->condition->ATTR(type)->equal(BaseType::Int)) {
+        issue(s->condition->getLocation(), new BadTestExprError());
+    }
+
+    s->loop_body->accept(this);
+}
+
+/* Visits an ast::ForStmt node.
+ *
+ * PARAMETERS:
+ *   e     - the ast::ForStmt node
+ */
+void SemPass2::visit(ast::ForStmt *s) {
+    if(s->exprInit!=nullptr) {
+        s->exprInit->accept(this);
+        if (!s->exprInit->ATTR(type)->equal(BaseType::Int)) {
+            issue(s->exprInit->getLocation(), new BadTestExprError());
+        }
+    }
+    // else if(s->varDeclInit!=nullptr) {
+    //     s->varDeclInit->accept(this);
+    //     if (!s->varDeclInit->ATTR(type)->equal(BaseType::Int)) {
+    //         issue(s->varDeclInit->getLocation(), new BadTestExprError());
+    //     }
+    // }
+    if(s->condition!=nullptr) {
+        s->condition->accept(this);
+        if (!s->condition->ATTR(type)->equal(BaseType::Int)) {
+            issue(s->condition->getLocation(), new BadTestExprError());
+        }
+    }
+    if(s->update!=nullptr) {
+        s->update->accept(this);
+        if (!s->update->ATTR(type)->equal(BaseType::Int)) {
+            issue(s->update->getLocation(), new BadTestExprError());
+        }
+    }
+    s->loop_body->accept(this);
+}
+
+/* Visits an ast::BreakStmt node.
+ *
+ * PARAMETERS:
+ *   e     - the ast::BreakStmt node
+ */
+void SemPass2::visit(ast::BreakStmt *s) {}
+
+/* Visits an ast::ContStmt node.
+ *
+ * PARAMETERS:
+ *   e     - the ast::ContStmt node
+ */
+void SemPass2::visit(ast::ContStmt *s) {}
 
 /* Visits an ast::ReturnStmt node.
  *

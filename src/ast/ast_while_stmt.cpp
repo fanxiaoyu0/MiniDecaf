@@ -50,6 +50,92 @@ void WhileStmt::dumpTo(std::ostream &os) {
     decIndent(os);
 }
 
+//-------------------------------------------------------------------------------
+/* Creates a new DoWhileStmt node.
+ *
+ * PARAMETERS:
+ *   cond    - the test expression
+ *   body    - the loop body
+ *   l       - position in the source text
+ */
+DoWhileStmt::DoWhileStmt(Expr *cond, Statement *body, Location *l) {
+    setBasicInfo(DO_WHILE_STMT, l);
+    condition = cond;
+    loop_body = body;
+}
+
+/* Visits the current node.
+ *
+ * PARAMETERS:
+ *   v       - the visitor
+ */
+void DoWhileStmt::accept(Visitor *v) { v->visit(this); }
+
+/* Prints the current AST node.
+ *
+ * PARAMETERS:
+ *   os      - the output stream
+ */
+void DoWhileStmt::dumpTo(std::ostream &os) {
+    ASTNode::dumpTo(os);
+    newLine(os);
+    os << condition;
+
+    newLine(os);
+    os << loop_body << ")";
+    decIndent(os);
+}
+
+//-------------------------------------------------------------------------------
+/* Creates a new ForStmt node.
+ *
+ * PARAMETERS:
+ *   init    - the init expression or declaration
+ *   cond    - the test expression
+ *   uodate  - the update expression
+ *   body    - the loop body
+ *   l       - position in the source text
+ */
+ForStmt::ForStmt(Expr* init, Expr *cond, Expr* update, Statement* body, Location* l) {
+    setBasicInfo(FOR_STMT, l);
+    exprInit = init;
+    varDeclInit = nullptr;
+    condition = cond;
+    update = update;
+    loop_body = body;
+}
+ForStmt::ForStmt(VarDecl* init, Expr *cond, Expr* update, Statement* body, Location* l){
+    setBasicInfo(FOR_STMT, l);
+    exprInit = nullptr;
+    varDeclInit = init;
+    condition = cond;
+    update = update;
+    loop_body = body;
+}
+    
+/* Visits the current node.
+ *
+ * PARAMETERS:
+ *   v       - the visitor
+ */
+void ForStmt::accept(Visitor *v) { v->visit(this); }
+
+/* Prints the current AST node.
+ *
+ * PARAMETERS:
+ *   os      - the output stream
+ */
+void ForStmt::dumpTo(std::ostream &os) {
+    ASTNode::dumpTo(os);
+    newLine(os);
+    os << condition;
+
+    newLine(os);
+    os << loop_body << ")";
+    decIndent(os);
+}
+
+//-----------------------------------------------------------------------------------------
 /* Creates a new BreakStmt node.
  *
  * PARAMETERS:
@@ -75,14 +161,7 @@ void BreakStmt::dumpTo(std::ostream &os) {
     decIndent(os);
 }
 
-// class ContStmt : public Statement {
-//   public:
-//     ContStmt(Location *l);
-
-//     virtual void accept(Visitor *);
-//     virtual void dumpTo(std::ostream &);
-// };
-
+//----------------------------------------------------------------------------------------------
 /* Creates a new ContStmt node.
  *
  * PARAMETERS:

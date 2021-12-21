@@ -36,6 +36,8 @@ class SemPass1 : public ast::Visitor {
     virtual void visit(ast::Program *);
     virtual void visit(ast::IfStmt *);
     virtual void visit(ast::WhileStmt *);
+    virtual void visit(ast::DoWhileStmt *);
+    virtual void visit(ast::ForStmt *);
     virtual void visit(ast::CompStmt *);
     virtual void visit(ast::VarDecl *);
     // visiting types
@@ -134,6 +136,37 @@ void SemPass1::visit(ast::WhileStmt *s) {
     s->loop_body->accept(this);
 }
 
+/* Visits an ast::DoWhileStmt node.
+ *
+ * PARAMETERS:
+ *   e     - the ast::DoWhileStmt node
+ */
+void SemPass1::visit(ast::DoWhileStmt *s) {
+    s->condition->accept(this);
+    s->loop_body->accept(this);
+}
+
+/* Visits an ast::ForStmt node.
+ *
+ * PARAMETERS:
+ *   e     - the ast::ForStmt node
+ */
+void SemPass1::visit(ast::ForStmt *s) {
+    // opens function scope
+    Scope *scope = new LocalScope();
+    s->ATTR(scope) = scope;
+    scopes->open(scope);
+
+    if(s->exprInit!=nullptr) s->exprInit->accept(this);
+    else if(s->varDeclInit!=nullptr) s->varDeclInit->accept(this);
+    if(s->condition!=nullptr) s->condition->accept(this);
+    if(s->update!=nullptr) s->update->accept(this);
+    s->loop_body->accept(this);
+
+    // closes function scope
+    scopes->close();
+}
+
 /* Visiting an ast::CompStmt node.
  */
 void SemPass1::visit(ast::CompStmt *c) {
@@ -163,7 +196,7 @@ void SemPass1::visit(ast::VarDecl *vdecl) {
 
     vdecl->type->accept(this);
     t = vdecl->type->ATTR(type);
-    if (scopes->lookup(vdecl->name, vdecl->getLocation(), false) != NULL) { // ±¨´í
+    if (scopes->lookup(vdecl->name, vdecl->getLocation(), false) != NULL) { // ï¿½ï¿½ï¿½ï¿½
         issue(vdecl->getLocation(),
               new DeclConflictError(
                   vdecl->name,
@@ -174,12 +207,12 @@ void SemPass1::visit(ast::VarDecl *vdecl) {
         vdecl->ATTR(sym) = symbol;
         if (vdecl->init != NULL) {
             vdecl->init->accept(this);
-            // Èç¹ûÕâ¸ö±äÁ¿¶¨ÒåÉèÖÃÁË³õÖµ£¬»¹ÐèÒª¼ÌÐø·ÃÎÊ³õÖµ±í´ïÊ½
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë³ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê³ï¿½Öµï¿½ï¿½ï¿½ï¿½Ê½
             // SemPass2 did this work!?!
             // Why should I visit the init of VarDecl? It is only consist of constant value. 
             // Will it support using other variable to define this variable ?
             // At that time, I should visit the init because maybe it will use variable undecleared.
-            // ÈçºÎ¼ÌÐø·ÃÎÊ³õÖµ±í´ïÊ½£¨ÐèÒªÎÒ×Ô¼ºÐ´ Expr µÄ accept function?£©
+            // ï¿½ï¿½Î¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê³ï¿½Öµï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Ô¼ï¿½Ð´ Expr ï¿½ï¿½ accept function?ï¿½ï¿½
             //vdcel->init->accept(this);
         }
         

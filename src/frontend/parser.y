@@ -174,6 +174,17 @@ CompStmt    : LBRACE StmtList RBRACE
 WhileStmt   : WHILE LPAREN Expr RPAREN Stmt
                 { $$ = new ast::WhileStmt($3, $5, POS(@1)); }
             ;
+DoWhileStmt : DO Stmt WHILE LPAREN Expr RPAREN SEMICOLON
+                { $$ = new ast::DoWhileStmt($5, $2, POS(@1)); }
+            ;
+ExprOrEpsilon : Expr  {$$ = $1;}|
+                /* empty */ { $$ = nullptr; }
+            ;
+ForStmt     : FOR LPAREN ExprOrEpsilon SEMICOLON ExprOrEpsilon SEMICOLON ExprOrEpsilon RPAREN Stmt
+                { $$ = new ast::ForStmt($3, $5, $7, $9, POS(@1)); }|
+              FOR LPAREN VarDecl ExprOrEpsilon SEMICOLON ExprOrEpsilon RPAREN Stmt
+                { $$ = new ast::ForStmt($3, $5, $7, $9, POS(@1)); }
+            ;
 IfStmt      : IF LPAREN Expr RPAREN Stmt
                 { $$ = new ast::IfStmt($3, $5, new ast::EmptyStmt(POS(@5)), POS(@1)); }
             | IF LPAREN Expr RPAREN Stmt ELSE Stmt
