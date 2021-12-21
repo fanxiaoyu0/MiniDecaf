@@ -188,7 +188,7 @@ ForStmt     : FOR LPAREN Expr SEMICOLON Expr SEMICOLON Expr RPAREN Stmt
               FOR LPAREN SEMICOLON Expr SEMICOLON Expr RPAREN Stmt
                 { $$ = new ast::ForStmt(nullptr, $4, $6, $8, POS(@1)); }|
               FOR LPAREN SEMICOLON Expr SEMICOLON RPAREN Stmt
-                { $$ = new ast::ForStmt(nullptr, $3, nullptr, $7, POS(@1)); }|
+                { $$ = new ast::ForStmt(nullptr, $4, nullptr, $7, POS(@1)); }|
               FOR LPAREN SEMICOLON SEMICOLON Expr RPAREN Stmt
                 { $$ = new ast::ForStmt(nullptr, nullptr, $5, $7, POS(@1)); }|
               FOR LPAREN SEMICOLON SEMICOLON RPAREN Stmt
