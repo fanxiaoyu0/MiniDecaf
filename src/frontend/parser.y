@@ -177,13 +177,31 @@ WhileStmt   : WHILE LPAREN Expr RPAREN Stmt
 DoWhileStmt : DO Stmt WHILE LPAREN Expr RPAREN SEMICOLON
                 { $$ = new ast::DoWhileStmt($5, $2, POS(@1)); }
             ;
-ExprOrEpsilon : Expr  {$$ = $1;}|
-                /* empty */ { $$ = nullptr; }
-            ;
-ForStmt     : FOR LPAREN ExprOrEpsilon SEMICOLON ExprOrEpsilon SEMICOLON ExprOrEpsilon RPAREN Stmt
+ForStmt     : FOR LPAREN Expr SEMICOLON Expr SEMICOLON Expr RPAREN Stmt
                 { $$ = new ast::ForStmt($3, $5, $7, $9, POS(@1)); }|
-              FOR LPAREN VarDecl ExprOrEpsilon SEMICOLON ExprOrEpsilon RPAREN Stmt
-                { $$ = new ast::ForStmt($3, $5, $7, $9, POS(@1)); }
+              FOR LPAREN Expr SEMICOLON Expr SEMICOLON RPAREN Stmt
+                { $$ = new ast::ForStmt($3, $5, nullptr, $8, POS(@1)); }|
+              FOR LPAREN Expr SEMICOLON SEMICOLON Expr RPAREN Stmt
+                { $$ = new ast::ForStmt($3, nullptr, $6, $8, POS(@1)); }|
+              FOR LPAREN Expr SEMICOLON SEMICOLON RPAREN Stmt
+                { $$ = new ast::ForStmt($3, nullptr, nullptr, $7, POS(@1)); }|
+              FOR LPAREN SEMICOLON Expr SEMICOLON Expr RPAREN Stmt
+                { $$ = new ast::ForStmt(nullptr, $4, $6, $8, POS(@1)); }|
+              FOR LPAREN SEMICOLON Expr SEMICOLON RPAREN Stmt
+                { $$ = new ast::ForStmt(nullptr, $3, nullptr, $7, POS(@1)); }|
+              FOR LPAREN SEMICOLON SEMICOLON Expr RPAREN Stmt
+                { $$ = new ast::ForStmt(nullptr, nullptr, $5, $7, POS(@1)); }|
+              FOR LPAREN SEMICOLON SEMICOLON RPAREN Stmt
+                { $$ = new ast::ForStmt(nullptr, nullptr, nullptr, $6, POS(@1)); }|
+
+              FOR LPAREN VarDecl Expr SEMICOLON Expr RPAREN Stmt
+                { $$ = new ast::ForStmt($3, $4, $6, $8, POS(@1)); }|
+              FOR LPAREN VarDecl Expr SEMICOLON RPAREN Stmt
+                { $$ = new ast::ForStmt($3, $4, nullptr, $7, POS(@1)); }|
+              FOR LPAREN VarDecl SEMICOLON Expr RPAREN Stmt
+                { $$ = new ast::ForStmt($3, nullptr, $5, $7, POS(@1)); }|
+              FOR LPAREN VarDecl SEMICOLON RPAREN Stmt
+                { $$ = new ast::ForStmt($3, nullptr, nullptr, $6, POS(@1)); }
             ;
 IfStmt      : IF LPAREN Expr RPAREN Stmt
                 { $$ = new ast::IfStmt($3, $5, new ast::EmptyStmt(POS(@5)), POS(@1)); }
