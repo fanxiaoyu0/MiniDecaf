@@ -125,25 +125,105 @@ void Translation::visit(ast::IfStmt *s) {
 
     tr->genMarkLabel(L2);
 }
+
 /* Translating an ast::WhileStmt node.
  */
 void Translation::visit(ast::WhileStmt *s) {
     Label L1 = tr->getNewLabel();
     Label L2 = tr->getNewLabel();
+    Label L3 = tr->getNewLabel(); // continue label
 
     Label old_break = current_break_label;
     current_break_label = L2;
+    Label old_continue = current_continue_label;
+    current_continue_label = L3;
 
     tr->genMarkLabel(L1);
     s->condition->accept(this);
     tr->genJumpOnZero(L2, s->condition->ATTR(val));
 
     s->loop_body->accept(this);
+    tr->genMarkLabel(L3);
     tr->genJump(L1);
 
     tr->genMarkLabel(L2);
 
     current_break_label = old_break;
+    current_continue_label = old_continue;
+}
+
+// label BEGINLOOP_LABEL：开始下一轮迭代
+    // cond 的 IR
+    // beqz BREAK_LABEL：条件不满足就终止循环
+    // body 的 IR
+    // label CONTINUE_LABEL：continue 跳到这
+    // br BEGINLOOP_LABEL：本轮迭代完成
+    // label BREAK_LABEL：条件不满足，或者 break 语句都会跳到这儿
+
+/* Translating an ast::DoWhileStmt node.
+ */
+void Translation::visit(ast::DoWhileStmt *s) {
+    Label L1 = tr->getNewLabel(); 
+    Label L2 = tr->getNewLabel(); // break label
+    Label L3 = tr->getNewLabel(); // continue label
+
+    Label old_break = current_break_label;
+    current_break_label = L2;
+    Label old_continue = current_continue_label;
+    current_continue_label = L3;
+
+    tr->genMarkLabel(L1);
+    s->loop_body->accept(this);
+    tr->genMarkLabel(L3);
+    s->condition->accept(this);
+    tr->genJumpOnZero(L2, s->condition->ATTR(val));
+    tr->genJump(L1);
+    tr->genMarkLabel(L2);
+
+    current_break_label = old_break;
+    current_continue_label = old_continue;
+}
+
+//     _T1 = 0
+//     _T0 = _T1                 # int i = 0;
+// _L1:                          # begin label
+//     _T2 = 5
+//     _T3 = LT _T0, _T2
+//     BEQZ _T3, _L3              # i < 5;
+//     JUMP _L3                   # 循环体
+// _L2:                          # loop label
+//     _T4 = 1
+//     _T5 = ADD _T0, _T4
+//     _T0 = _T5                 # i = i + 1;
+//     JUMP _L1
+// _L3:                          # break label
+//     # 后续指令 ...
+
+/* Translating an ast::ForStmt node.
+ */
+void Translation::visit(ast::ForStmt *s) {
+    Label L1 = tr->getNewLabel();
+    Label L2 = tr->getNewLabel();
+    Label L3 = tr->getNewLabel(); // continue label
+
+    Label old_break = current_break_label;
+    current_break_label = L2;
+    Label old_continue = current_continue_label;
+    current_continue_label = L3;
+
+    if(s->exprInit!=nullptr) s->exprInit->accept(this);
+    else if(s->varDeclInit!=nullptr) s->varDeclInit->accept(this);
+    tr->genMarkLabel(L1);
+    if(s->condition!=nullptr) s->condition->accept(this);
+    tr->genJumpOnZero(L2, s->condition->ATTR(val));
+    s->loop_body->accept(this);
+    tr->genMarkLabel(L3);
+    if(s->update!=nullptr) s->update->accept(this);
+    tr->genJump(L1);
+    tr->genMarkLabel(L2);
+
+    current_break_label = old_break;
+    current_continue_label = old_continue;
 }
 
 /* Translating an ast::BreakStmt node.
@@ -152,7 +232,7 @@ void Translation::visit(ast::BreakStmt *s) { tr->genJump(current_break_label); }
 
 /* Translating an ast::ContStmt node.
  */
-void Translation::visit(ast::ContStmt *s) { tr->genJump(current_break_label); }
+void Translation::visit(ast::ContStmt *s) { tr->genJump(current_continue_label); }
 
 /* Translating an ast::CompStmt node.
  */
