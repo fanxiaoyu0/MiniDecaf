@@ -494,18 +494,17 @@ void SemPass2::visit(ast::DoWhileStmt *s) {
  *   e     - the ast::ForStmt node
  */
 void SemPass2::visit(ast::ForStmt *s) {
+    // opens function scope
+    // Scope *scope = new LocalScope();
+    // s->ATTR(scope) = scope;
+    scopes->open(s->ast_attr_scope_);
+
     if(s->exprInit!=nullptr) {
         s->exprInit->accept(this);
         if (!s->exprInit->ATTR(type)->equal(BaseType::Int)) {
             issue(s->exprInit->getLocation(), new BadTestExprError());
         }
     }
-    // else if(s->varDeclInit!=nullptr) {
-    //     s->varDeclInit->accept(this);
-    //     if (!s->varDeclInit->ATTR(type)->equal(BaseType::Int)) {
-    //         issue(s->varDeclInit->getLocation(), new BadTestExprError());
-    //     }
-    // }
     if(s->condition!=nullptr) {
         s->condition->accept(this);
         if (!s->condition->ATTR(type)->equal(BaseType::Int)) {
@@ -519,6 +518,9 @@ void SemPass2::visit(ast::ForStmt *s) {
         }
     }
     s->loop_body->accept(this);
+
+    // closes function scope
+    scopes->close();
 }
 
 /* Visits an ast::BreakStmt node.

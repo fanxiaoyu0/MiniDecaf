@@ -157,8 +157,14 @@ void SemPass1::visit(ast::ForStmt *s) {
     s->ATTR(scope) = scope;
     scopes->open(scope);
 
-    if(s->exprInit!=nullptr) s->exprInit->accept(this);
-    else if(s->varDeclInit!=nullptr) s->varDeclInit->accept(this);
+    if(s->exprInit!=nullptr) {
+        s->exprInit->accept(this);
+        // std::cout<<"exprInit!"<<std::endl;
+    }
+    else if(s->varDeclInit!=nullptr){
+        s->varDeclInit->accept(this);
+        // std::cout<<"varDeclInit!"<<std::endl;
+    } 
     if(s->condition!=nullptr) s->condition->accept(this);
     if(s->update!=nullptr) s->update->accept(this);
     s->loop_body->accept(this);

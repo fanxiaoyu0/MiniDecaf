@@ -95,9 +95,10 @@ void scan_end();
 %nterm<mind::ast::Program* > Program FoDList
 %nterm<mind::ast::FuncDefn* > FuncDefn
 %nterm<mind::ast::Type*> Type IntType
-%nterm<mind::ast::Statement*> Stmt ReturnStmt ExprStmt IfStmt CompStmt WhileStmt VarDecl ForStmt DoWhileStmt
+%nterm<mind::ast::Statement*> Stmt ReturnStmt ExprStmt IfStmt CompStmt WhileStmt ForStmt DoWhileStmt
 %nterm<mind::ast::Expr*> Expr AssignExpr
 %nterm<mind::ast::VarRef*> VarRef
+%nterm<mind::ast::VarDecl*> VarDecl
 
 /*   SUBSECTION 2.2: associativeness & precedences */
 %nonassoc QUESTION
