@@ -104,7 +104,7 @@ ForStmt::ForStmt(Expr* init, Expr *cond, Expr* update, Statement* body, Location
     update = update;
     loop_body = body;
 }
-ForStmt::ForStmt(VarDecl* init, Expr *cond, Expr* update, Statement* body, Location* l){
+ForStmt::ForStmt(Statement* init, Expr *cond, Expr* update, Statement* body, Location* l, int dumy){
     setBasicInfo(FOR_STMT, l);
     exprInit = nullptr;
     varDeclInit = init;

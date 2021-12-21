@@ -95,7 +95,7 @@ void scan_end();
 %nterm<mind::ast::Program* > Program FoDList
 %nterm<mind::ast::FuncDefn* > FuncDefn
 %nterm<mind::ast::Type*> Type IntType
-%nterm<mind::ast::Statement*> Stmt ReturnStmt ExprStmt IfStmt CompStmt WhileStmt VarDecl ForStmt DoWhileStmt BreakStmt ContinueStmt
+%nterm<mind::ast::Statement*> Stmt ReturnStmt ExprStmt IfStmt CompStmt WhileStmt VarDecl ForStmt DoWhileStmt
 %nterm<mind::ast::Expr*> Expr AssignExpr
 %nterm<mind::ast::VarRef*> VarRef
 
@@ -195,13 +195,13 @@ ForStmt     : FOR LPAREN Expr SEMICOLON Expr SEMICOLON Expr RPAREN Stmt
                 { $$ = new ast::ForStmt(nullptr, nullptr, nullptr, $6, POS(@1)); }|
 
               FOR LPAREN VarDecl Expr SEMICOLON Expr RPAREN Stmt
-                { $$ = new ast::ForStmt($3, $4, $6, $8, POS(@1)); }|
+                { $$ = new ast::ForStmt($3, $4, $6, $8, POS(@1), 0); }|
               FOR LPAREN VarDecl Expr SEMICOLON RPAREN Stmt
-                { $$ = new ast::ForStmt($3, $4, nullptr, $7, POS(@1)); }|
+                { $$ = new ast::ForStmt($3, $4, nullptr, $7, POS(@1), 0); }|
               FOR LPAREN VarDecl SEMICOLON Expr RPAREN Stmt
-                { $$ = new ast::ForStmt($3, nullptr, $5, $7, POS(@1)); }|
+                { $$ = new ast::ForStmt($3, nullptr, $5, $7, POS(@1), 0); }|
               FOR LPAREN VarDecl SEMICOLON RPAREN Stmt
-                { $$ = new ast::ForStmt($3, nullptr, nullptr, $6, POS(@1)); }
+                { $$ = new ast::ForStmt($3, nullptr, nullptr, $6, POS(@1), 0); }
             ;
 IfStmt      : IF LPAREN Expr RPAREN Stmt
                 { $$ = new ast::IfStmt($3, $5, new ast::EmptyStmt(POS(@5)), POS(@1)); }

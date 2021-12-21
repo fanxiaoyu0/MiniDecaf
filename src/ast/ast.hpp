@@ -333,7 +333,7 @@ class DoWhileStmt : public Statement {
 class ForStmt : public Statement {
   public:
     ForStmt(Expr* init, Expr *cond, Expr* update, Statement *loop_body, Location *l);
-    ForStmt(VarDecl* init, Expr *cond, Expr* update, Statement *loop_body, Location *l);
+    ForStmt(Statement* init, Expr *cond, Expr* update, Statement *loop_body, Location *l, int dumy);
 
     virtual void accept(Visitor *);
     virtual void dumpTo(std::ostream &);
@@ -341,7 +341,7 @@ class ForStmt : public Statement {
   public:
     scope::Scope *ATTR(scope);
     Expr* exprInit = nullptr;
-    VarDecl* varDeclInit = nullptr;
+    Statement* varDeclInit = nullptr;
     Expr* condition = nullptr;
     Expr* update = nullptr;
     Statement *loop_body;
