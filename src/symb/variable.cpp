@@ -113,4 +113,10 @@ void Variable::attachTemp(tac::Temp v) {
  * RETURNS:
  *   the attached register object
  */
-Temp Variable::getTemp(void) { return attached; }
+Temp Variable::getTemp(void) { 
+    // std::cout<<"!!!!!!!!!!!!!"<<std::endl;
+    // attached;
+    // std::cout<<"kkkkkkkkkkkkk"<<std::endl;
+    return attached; 
+
+}

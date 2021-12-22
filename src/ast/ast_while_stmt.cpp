@@ -96,21 +96,21 @@ void DoWhileStmt::dumpTo(std::ostream &os) {
  *   body    - the loop body
  *   l       - position in the source text
  */
-ForStmt::ForStmt(Expr* init, Expr *cond, Expr* update, Statement* body, Location* l) {
+ForStmt::ForStmt(Expr* _init, Expr* _condition, Expr* _update, Statement* _body, Location* l) {
     setBasicInfo(FOR_STMT, l);
-    exprInit = init;
+    exprInit = _init;
     varDeclInit = nullptr;
-    condition = cond;
-    update = update;
-    loop_body = body;
+    condition = _condition;
+    update = _update;
+    loop_body = _body;
 }
-ForStmt::ForStmt(VarDecl* init, Expr *cond, Expr* update, Statement* body, Location* l, int dumy){
+ForStmt::ForStmt(VarDecl* _init, Expr* _condition, Expr* _update, Statement* _body, Location* l, int dumy){
     setBasicInfo(FOR_STMT, l);
     exprInit = nullptr;
-    varDeclInit = init;
-    condition = cond;
-    update = update;
-    loop_body = body;
+    varDeclInit = _init;
+    condition = _condition;
+    update = _update;
+    loop_body = _body;
 }
     
 /* Visits the current node.

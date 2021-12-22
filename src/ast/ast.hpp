@@ -332,8 +332,8 @@ class DoWhileStmt : public Statement {
  */
 class ForStmt : public Statement {
   public:
-    ForStmt(Expr* init, Expr *cond, Expr* update, Statement *loop_body, Location *l);
-    ForStmt(VarDecl* init, Expr *cond, Expr* update, Statement *loop_body, Location *l, int dumy);
+    ForStmt(Expr* _init, Expr* _condition, Expr* _update, Statement* _body, Location *l);
+    ForStmt(VarDecl* _init, Expr* _condition, Expr* _update, Statement* _body, Location *l, int dumy);
 
     virtual void accept(Visitor *);
     virtual void dumpTo(std::ostream &);

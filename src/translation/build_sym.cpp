@@ -40,6 +40,9 @@ class SemPass1 : public ast::Visitor {
     virtual void visit(ast::ForStmt *);
     virtual void visit(ast::CompStmt *);
     virtual void visit(ast::VarDecl *);
+
+    // virtual void visit(ast::LvalueExpr *);
+    // virtual void visit(ast::VarRef *);
     // visiting types
     virtual void visit(ast::IntType *);
 };
@@ -231,6 +234,53 @@ void SemPass1::visit(ast::VarDecl *vdecl) {
     // 4. Special processing for global variables
     // 5. Tag the symbol to `vdecl->ATTR(sym)`
 }
+
+/* Visits an ast::LvalueExpr node.
+ *
+ * PARAMETERS:
+ *   e     - the ast::LvalueExpr node
+ */
+// void SemPass1::visit(ast::LvalueExpr *e) {
+//     e->lvalue->accept(this);
+//     // e->ATTR(sym) = e->lvalue->ATTR(sym);
+// }
+
+/* Visits an ast::VarRef node.
+ *
+ * PARAMETERS:
+ *   e     - the ast::VarRef node
+ */
+// void SemPass1::visit(ast::VarRef *ref) {
+//     // CASE I: owner is NULL ==> referencing a local var or a member var?
+//     Symbol *v = scopes->lookup(ref->var, ref->getLocation());
+//     // ?: Seems to check if a variable is decleared or not is the work
+//     // of SemPass1. Why does it do it now?
+//     // If do this, variable decleared soon could be used now. 
+//     if (NULL == v) {
+//         issue(ref->getLocation(), new SymbolNotFoundError(ref->var));
+//         // goto issue_error_type;
+
+//     } else if (!v->isVariable()) {
+//         issue(ref->getLocation(), new NotVariableError(v));
+//         // goto issue_error_type;
+
+//     } else {
+//         // ref->ATTR(type) = v->getType();
+//         ref->ATTR(sym) = (Variable *)v;
+
+//         if (((Variable *)v)->isLocalVar()) {
+//             ref->ATTR(lv_kind) = ast::Lvalue::SIMPLE_VAR;
+//         }
+//     }
+
+//     return;
+
+//     // sometimes "GOTO" will make things simpler. this is one of such cases:
+// // issue_error_type:
+// //     ref->ATTR(type) = BaseType::Error;
+// //     ref->ATTR(sym) = NULL;
+// //     return;
+// }
 
 /* Visiting an ast::IntType node.
  *

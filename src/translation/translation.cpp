@@ -187,6 +187,7 @@ void Translation::visit(ast::DoWhileStmt *s) {
 /* Translating an ast::ForStmt node.
  */
 void Translation::visit(ast::ForStmt *s) {
+    
     Label L1 = tr->getNewLabel();
     Label L2 = tr->getNewLabel();
     Label L3 = tr->getNewLabel(); // continue label
@@ -196,14 +197,27 @@ void Translation::visit(ast::ForStmt *s) {
     Label old_continue = current_continue_label;
     current_continue_label = L3;
 
-    if(s->exprInit!=nullptr) s->exprInit->accept(this);
-    else if(s->varDeclInit!=nullptr) s->varDeclInit->accept(this);
+    if(s->exprInit!=nullptr) {
+        s->exprInit->accept(this);
+        
+    }
+    else if(s->varDeclInit!=nullptr) {
+        s->varDeclInit->accept(this);
+        // std::cout<<"visit(ast::ForStmt *s)!"<<std::endl;
+    }
     tr->genMarkLabel(L1);
-    if(s->condition!=nullptr) s->condition->accept(this);
-    tr->genJumpOnZero(L2, s->condition->ATTR(val));
+    
+    if(s->condition!=nullptr) {
+        s->condition->accept(this);
+        tr->genJumpOnZero(L2, s->condition->ATTR(val));
+        // std::cout<<"s->condition!=nullptr!"<<std::endl;
+    }
     s->loop_body->accept(this);
     tr->genMarkLabel(L3);
-    if(s->update!=nullptr) s->update->accept(this);
+    if(s->update!=nullptr) {
+        s->update->accept(this);
+        // std::cout<<"s->update==nullptr!"<<std::endl;
+    }
     tr->genJump(L1);
     tr->genMarkLabel(L2);
 
@@ -386,12 +400,17 @@ void Translation::visit(ast::BitNotExpr *e) {
  *   different Lvalue kinds need different translation
  */
 void Translation::visit(ast::LvalueExpr *e) {
+    // std::cout<<"+++++++++++++"<<std::endl;
     // The only task is to change e->ATTR(val) for its father's use.
     e->lvalue->accept(this);
+    
     // e Ϊ visit(ast::LvalueExpr* e) �Ĳ���
-    const auto &sym = ((ast::VarRef *)e->lvalue)->ATTR(sym);
+    const auto sym = ((ast::VarRef *)e->lvalue)->ATTR(sym);
+    // sym->getTemp();
+    
     // ��ʱ������ͨ�� sym->getTemp() ���ʸ÷��Ŷ�Ӧ�� Temp
     e->ATTR(val) = sym->getTemp();
+    
 }
 
 /* Translating an ast::IfExpr node.
@@ -439,11 +458,15 @@ void Translation::visit(ast::VarRef *ref) {
 /* Translating an ast::VarDecl node.
  */
 void Translation::visit(ast::VarDecl *decl) {
+
     Temp temp = tr->getNewTempI4();
     decl->ATTR(sym)->attachTemp(temp);
     if (decl->init != NULL) {
+        // std::cout<<"!!!!!!!!!!!!!"<<std::endl;
         decl->init->accept(this);
+        // std::cout<<"+++++++++++++"<<std::endl;
         tr->genAssign(decl->ATTR(sym)->getTemp(), decl->init->ATTR(val));
+        // std::cout<<"?????????????"<<std::endl;
     }
 }
 

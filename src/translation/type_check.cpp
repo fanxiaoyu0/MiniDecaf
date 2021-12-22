@@ -377,7 +377,7 @@ void SemPass2::visit(ast::VarRef *ref) {
     // sometimes "GOTO" will make things simpler. this is one of such cases:
 issue_error_type:
     ref->ATTR(type) = BaseType::Error;
-    ref->ATTR(sym) = NULL;
+    // ref->ATTR(sym) = NULL;
     return;
 }
 
@@ -495,8 +495,6 @@ void SemPass2::visit(ast::DoWhileStmt *s) {
  */
 void SemPass2::visit(ast::ForStmt *s) {
     // opens function scope
-    // Scope *scope = new LocalScope();
-    // s->ATTR(scope) = scope;
     scopes->open(s->ast_attr_scope_);
 
     if(s->exprInit!=nullptr) {
